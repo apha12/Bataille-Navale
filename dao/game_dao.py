@@ -13,7 +13,7 @@ class GameEntity(Base):
     id = Column(Integer, primary_key=True)
     players = relationship("PlayerEntity", back_populates="game",cascade="all, delete-orphan")
 
-    
+
 class PlayerEntity(Base):
  __tablename__ = 'player'
  id = Column(Integer, primary_key=True)
@@ -23,3 +23,4 @@ class PlayerEntity(Base):
  battle_field = relationship("BattlefieldEntity",
  back_populates="player",
  uselist=False, cascade="all, delete-orphan")
+ 
