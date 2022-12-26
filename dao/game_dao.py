@@ -1,3 +1,4 @@
+from Model import Vessel 
 from sqlalchemy import create_engine, Column,Integer,String,ForeignKey,\
     select
 from sqlalchemy.ext.declarative import declarative_base
@@ -134,7 +135,7 @@ class GameDao:
 
 
 
-    def map_to_game_entity(game: GameEntity) -> GameEntity:
+    def map_to_game_entity(game: Game) -> GameEntity:
         game_entity = GameEntity()
         if game.get_id() is not None:
             game_entity.id = game.get_id()
@@ -143,17 +144,18 @@ class GameDao:
             player_entity.id = player.id
             player_entity.name = player.get_name()
             battlefield_entity = map_to_battlefield_entity(
-            player.get_battlefield())
+                player.get_battlefield())
             vessel_entities = \
-            map_to_vessel_entities(player.get_battlefield().id,player.get_battlefield().vessels)
+                map_to_vessel_entities(player.get_battlefield().id,
+                                    player.get_battlefield().vessels)
             battlefield_entity.vessels = vessel_entities
             player_entity.battle_field = battlefield_entity
             game_entity.players.append(player_entity)
         return game_entity
 
-    
-    def map_to_vessel_entities(battlefield_id: int, vessels: list[Vessel]) \ -> list[VesselEntity]:
-        vessel_entities: list[VesselEntity] = []
+    def map_to_vessel_entities(battlefield_id: int, vessels: list[Vessel]) \
+            -> list[VesseldEntity]:
+        vessel_entities: list[VesseldEntity] = []
         for vessel in vessels:
             vessel_entity = map_to_vessel_entity(battlefield_id, vessel)
             vessel_entities.append(vessel_entity)
@@ -161,9 +163,9 @@ class GameDao:
         return vessel_entities
 
 
-    def map_to_vessel_entity(battlefield_id: int, vessel: Vessel) -> VesselEntity:
-        vessel_entity = VesselEntity()
-        weapon_entity = WeaponEntity()
+    def map_to_vessel_entity(battlefield_id: int, vessel: Vessel) -> VesseldEntity:
+        vessel_entity = VesseldEntity()
+        weapon_entity = WeapondEntity()
         weapon_entity.id = vessel.weapon.id
         weapon_entity.ammunitions = vessel.weapon.ammunitions
         weapon_entity.range = vessel.weapon.range
@@ -177,7 +179,6 @@ class GameDao:
         vessel_entity.coord_z = vessel.coordinates[2]
         vessel_entity.battle_field_id = battlefield_id
         return vessel_entity
-
 
     def map_to_player_entity(player: Player) -> PlayerEntity:
         player_entity = PlayerEntity()
@@ -198,12 +199,3 @@ class GameDao:
         battlefield_entity.min_z = battlefield.min_z
         battlefield_entity.max_power = battlefield.max_power
         return battlefield_entity
-
-    
-    
-    
-        
-    
-
-    
-        
