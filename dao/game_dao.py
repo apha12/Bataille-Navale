@@ -1,8 +1,8 @@
-from Model import Game
-from Model import Player
-from Model import Vessel
-from Model import Weapon
-from Model import Battlefield
+from Model.game import Game
+from Model.player import Player
+from Model.vessel import Vessel
+from Model.weapon import Weapon
+from Model.battlefield import Battlefield
 from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, select
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
