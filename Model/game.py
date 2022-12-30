@@ -1,4 +1,4 @@
-from Model.battlefield import Battlefield
+from battlefield import Battlefield
 
 class Player:
     def __init__(self, name: str, battle_field: Battlefield):
