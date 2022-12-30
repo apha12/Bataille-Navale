@@ -8,3 +8,6 @@ class Game:
 
     def get_players(self):
         return self.players 
+    
+    def add_player(self, player: Player):
+        return player.add_player(self.player)
