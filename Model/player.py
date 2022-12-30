@@ -1,11 +1,13 @@
-class Game:
-    def __init__(self, id=None):
-        self.id = id
 
-    def get_id(self):
-        return self._id
+from battlefield import Battlefield
 
-    def get_players(self):
-        return self.players 
+class Player:
+    def __init__(self, name: str, battle_field: Battlefield):
+        self.name = name
+        self.battlefield = Battlefield
 
-    
+    def get_name(self):
+        return self.name
+
+    def get_battlefield(self):
+        return self.battlefield
