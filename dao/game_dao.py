@@ -12,51 +12,74 @@ Base = declarative_base(bind=engine)
 Session = sessionmaker(bind=engine)
 
 class GameEntity(Base):
+    
     __tablename__ = 'game'
     id = Column(Integer, primary_key=True)
-    players = relationship("PlayerEntity", back_populates="game", cascade="all, delete-orphan")
+    players = relationship("PlayerEntity", back_populates="game",cascade="all, delete-orphan")
+
 
 class PlayerEntity(Base):
-    __tablename__ = 'player'
-    id = Column(Integer, primary_key=True)
-    name = Column(String, nullable=False)
-    game_id = Column(Integer, ForeignKey("game.id"), nullable=False)
-    game = relationship("GameEntity", back_populates="players")
-    battle_field = relationship("BattlefieldEntity", back_populates="player", uselist=False,
-                                cascade="all, delete-orphan")
+ __tablename__ = 'player'
+ id = Column(Integer, primary_key=True)
+ name = Column(String, nullable=False)
+ game_id = Column(Integer, ForeignKey("game.id"), nullable=False)
+ game = relationship("GameEntity", back_populates="players")
+ battle_field = relationship("BattlefieldEntity", back_populates="player", uselist=False, cascade="all, delete-orphan")
+ 
 
 class BattlefieldEntity(Base):
-    __tablename__ = 'battlefield'
-    id = Column(Integer, primary_key=True)
-    min_x = Column(Integer, nullable=False)
-    min_x = Column(Integer, nullable=False)
-    min_y = Column(Integer, nullable=False)
-    min_z = Column(Integer, nullable=False)
-    max_x = Column(Integer, nullable=False)
-    max_y = Column(Integer, nullable=False)
-    max_z = Column(Integer, nullable=False)
-    player = relationship("playerEntity", back_populates="player")
-    vessel = relationship("vesselEntity", back_populates="vessels", cascade="all, delete-orphan")
+    __tablename__='battlefield'
+    id= Column(Integer, primary_key=True)
+    min_x=Column(Integer)
+    min_y=Column(Integer)
+    min_z=Column(Integer)
+    max_x=Column(Integer)
+    max_y=Column(Integer)
+    max_z=Column(Integer)
+    max_power=Column(Integer)
+    player_id = Column(Integer, ForeignKey("player.id"), nullable=False)
+    vessel = relationship("VesselEntity", back_populates="Battle")
+    player = relationship("PlayerEntity", back_populates="battle_field")
 
-class VesselEntity(Base):
-    __tablename__ = 'vessel'
-    id = Column(Integer, primary_key=True)
-    coord_x = Column(Integer, nullable=True)
-    coord_y = Column(Integer, nullable=True)
-    coord_z = Column(Integer, nullable=True)
-    hits_to_be_destroyed = Column(Integer, nullable=True)
-    type = Column(String, nullable=False)
-    battlefield = relationship("battlefieldEntity", back_populates="battlefield")
-    weaponfield = relationship("battlefieldEntity", back_populates="weaponfield",
-                               uselist=False, cascade="all, delete-orphan")
 
-class WeaponEntity(Base):
-    __tablename__ = 'weapon'
-    id = Column(Integer, primary_key=True)
-    ammunitions = Column(Integer, nullable=True)
-    range = Column(Integer, nullable=True)
-    type = Column(String)
-    vessel = relationship("vesselEntity", back_populates="vessel")
+
+class VesseldEntity(Base):
+    __tablename__='vessel'
+    id= Column(Integer, primary_key=True)
+    coord_x=Column(Integer)
+    coord_y=Column(Integer)
+    coord_z=Column(Integer)
+    hits_to_be_destroyed=Column(Integer)
+    type=Column(String)
+    battle_field_id = Column(Integer, ForeignKey("player.id"), nullable=False)
+    Battle = relationship("BattlefieldEntity", back_populates="vessel")
+    weapon = relationship("WeaponEntity", back_populates="vessel")
+
+
+class WeapondEntity(Base):
+    __tablename__='weapon'
+    id= Column(Integer, primary_key=True)
+    ammunitions=Column(Integer)
+    range=Column(Integer)
+    type=Column(String)
+    battle_field_id = Column(Integer, ForeignKey("player.id"), nullable=False)
+    vessel= relationship("VesselEntity", back_populates="weapon")
+    
+
+
+class VesselTypes:
+
+    CRUISER = "Cruiser"
+    DESTROYER = "Destroyer"
+    FRIGATE = "Frigate"
+    SUBMARINE = "Submarine"
+            
+class  WeaponTypes:
+    
+    AIRMISSILELAUNCHER = "AirMissileLauncher"
+    SURFACEMISSILELAUNCHER = "SurfaceMissileLauncher"
+    TORPEDOLAUNCHER = "TorpedoLauncher"
+
 
 class GameDao:
     def __init__(self):
@@ -87,7 +110,7 @@ class GameDao:
         return map_to_game(game_entity)
 
     def find_vessel(self, vessel_id: int) -> Vessel:
-        stmt = select(VesselEntity).where(VesselEntity.id == vessel_id)
+        stmt = select(VesseldEntity).where(VesseldEntity.id == vessel_id)
         vessel_entity = self.db_session.scalars(stmt).one()
         return map_to_vessel(vessel_entity)
 
@@ -115,16 +138,16 @@ def map_to_game_entity(game: Game) -> GameEntity:
         game_entity.players.append(player_entity)
     return game_entity
 
-def map_to_vessel_entities(battlefield_id: int, vessels: list[Vessel]) -> list[VesselEntity]:
-    vessel_entities: list[VesselEntity] = []
+def map_to_vessel_entities(battlefield_id: int, vessels: list[Vessel]) -> list[VesseldEntity]:
+    vessel_entities: list[VesseldEntity] = []
     for vessel in vessels:
         vessel_entity = map_to_vessel_entity(battlefield_id, vessel)
         vessel_entities.append(vessel_entity)
     return vessel_entities
 
-def map_to_vessel_entity(battlefield_id: int, vessel: Vessel) -> VesselEntity:
-    vessel_entity = VesselEntity()
-    weapon_entity = WeaponEntity()
+def map_to_vessel_entity(battlefield_id: int, vessel: Vessel) -> VesseldEntity:
+    vessel_entity = VesseldEntity()
+    weapon_entity = WeapondEntity()
     weapon_entity.id = vessel.weapon.id
     weapon_entity.ammunitions = vessel.weapon.ammunitions
     weapon_entity.range = vessel.weapon.range
@@ -186,7 +209,7 @@ def map_to_game(game_entity: GameEntity) -> Game:
         game.add_player(player)
     return game
 
-def map_to_vessel(vessel_entity: VesselEntity) -> Vessel:
+def map_to_vessel(vessel_entity: VesseldEntity) -> Vessel:
     x = vessel_entity.coord_x
     y = vessel_entity.coord_y
     z = vessel_entity.coord_z

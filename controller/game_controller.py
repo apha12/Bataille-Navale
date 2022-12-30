@@ -6,6 +6,8 @@ from Model.game import Game
 from Services.game_service import GameService
 app = FastAPI()
 game_service = GameService()
+
+
 class CreateGameData(BaseModel):
     player_name: str
     min_x: int
@@ -14,6 +16,7 @@ class CreateGameData(BaseModel):
     max_y: int
     min_z: int
     max_z: int
+    
 @app.post("/create-game")
 async def create_game(game_data: CreateGameData):
     return game_service.create_game(game_data.player_name, game_data.min_x,
