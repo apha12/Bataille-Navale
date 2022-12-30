@@ -11,3 +11,4 @@ class Player:
 
     def get_battlefield(self):
         return self.battlefield
+
