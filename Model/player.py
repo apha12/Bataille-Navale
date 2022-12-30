@@ -11,3 +11,6 @@ class Player:
 
     def get_battlefield(self):
         return self.battlefield
+    
+    def add_player(self, player: Player):
+        return players.append(self.player)
