@@ -10,4 +10,4 @@ class Player:
         return self.name
 
     def get_battlefield(self):
-        return self.battlefield
+        return self.battle_field
